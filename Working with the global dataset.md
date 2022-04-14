@@ -2,15 +2,40 @@
 
 ## Introduction
 
-The global user database (LINK) is about 128 GB, effectively being a 943 x 69 million matrix. This (for me at least) posed challenges of its own, since it's not normal for me to work with databases of this size. Below I give some notes that may help someone who looks at this later.
+The global user database (see Releases) is about 128 GB, effectively being a 943 x 69 million matrix. This (for me at least) posed challenges of its own, since it's not normal for me to work with databases of this size. Below I give some notes that may help someone who looks at this later.
+
+Note: from GitHub Releases, you will need to join the split files if you want it that way. It's easy on Windows using the ``copy`` command line tool. 
 
 ## Excel
 
 The most fundamental problem with it is that it can only handle 1048576 (2<sup>20</sup>) of rows, which is a shame, because it's otherwise a really powerful and intuitive tool.
 
-So suppose you are fine with that. Then importing the CSV is pretty easy - the legacy import wizard is often a better choice as that directly imports the CSV to the spreadsheet rather than the "modern" method of creating a "connection". 
+So suppose you are fine with that. Then importing the CSV is pretty easy - the legacy import wizard is often a better choice as that directly imports the CSV to the spreadsheet rather than the "modern" method of creating a "connection". With that, Excel ate up to ~30 GB at times, and stayed at around 15 GB otherwise. Importing is quick (but then you have the row limit).
 
-Once you're done with that, some analysis can be done pretty easily. Load Analytics ToolPak. Then O(*n*) based operations can be done easily (for instance, descriptive statistics on *n* columns). However, trying to perform O(*n*<sup>2</sup>) operations (such as trying to compute the covariance matrix for *n* columns) is not worth it for larger values of *n*. The main issue is that Analytics ToolPak is single-threaded. 
+Once you're done with that, some analysis can be done pretty easily. Load Analytics ToolPak. Then O(*n*) based operations can be done in a reasonable amount of time (for instance, descriptive statistics on *n* columns). However, trying to perform O(*n*<sup>2</sup>) operations (such as trying to compute the covariance matrix for *n* columns) is not worth it for larger values of *n*. The main issue is that Analytics ToolPak is single-threaded. 
+
+<b>What about Access?</b> In theory it would have allowed me to get rid of the row limit of Excel, but Access has a 2 GB file limit which made it pointless...
 
 ## SQL
 
+This is with T-SQL by the way, so the one used by Microsoft SQL Server. 
+
+The reason I tried it was that I *thought* that queries would be quick given my past experience with it. Well, 
+
+* importing takes time (about a day) - which isn't that unreasonable given the context - but slower than what I expected.
+* You need to carefully handle the import and export wizard. For instance, the source is Unicode. However, you need to set the source as ``TEXT`` (text stream) and the destination for the username as ``NTEXT`` (unicode text stream), otherwise SQL Server will complain about a mismatch when trying to import. Also, instead of trying to change the variable type for every column, edit the SQL and mass-copy/replace using Notepad or another tool. 
+* The size of the SQL table when imported can be very large - over 300 GB in my experience. Watch out for that. Also, it may sound like it is also RAM-intensive but that's for caching (it helps to have more RAM though)
+* A simple query to find the users with the most edits took hours to complete - so a fail overall.
+
+## SPSS
+
+This was the tool that best worked for me overall. 
+
+* It is generally both RAM and disk-intensive. A 48 GB RAM VM worked well for me, but disk bottlenecks were a more serious issue (as it was running off a networked HDD) - make sure you have lots of high-speed storage as SPSS will create a cache in disk. Parts of the CSV importing process utilise multiple cores as well. Importing can be done in about 4 hours with that - faster than SQL. 
+* Unlike SQL's importing and exporting wizard, it is not easy to change all the variables from string to a number in one go. The best way to do that is by using a SPSS script: [run](https://webcache.googleusercontent.com/search?q=cache:tZ0hxEOR_ecJ:https://www.ibm.com/docs/SSLVMB_24.0.0/spss/base/syn_alter_type_overview.html+&cd=3&hl=en&ct=clnk&gl=uk) ``ALTER TYPE (first non-username column) to Total (A = F).`` What we want is to change the variable type of _all_ columns except the username (as that should be a string). This also ensures that the width of the numerical column is of the right size. Also do that - it reduced the size of the SPSS file from 550 GB to 68 GB and made subsequent operations much faster!
+* It was easy enough to generate histograms and _reasonably_ fast. Many of the operations are fully multi-threaded. 
+* I exhibited the issues in [this thread](https://superuser.com/questions/1496709/is-it-expected-that-vm-virtualbox-cannot-manage-more-than-16-cores) with VirtualBox - it seemed to be unstable with anything more than 16 cores - and even 16 cores didn't seem to work well (this could be due to how I was running off a university batch server, however). 
+
+## Python
+
+This tool does work, but is not as intuitive and the histograms generated by Matplotlib aren't as good as what SPSS can do. You'll have to do most things on your own. A sample that does this is available at this repository. 
