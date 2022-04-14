@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The global user database (see Releases) is about 128 GB, effectively being a 943 x 69 million matrix. This (for me at least) posed challenges of its own, since it's not normal for me to work with databases of this size. Below I give some notes that may help someone who looks at this later.
+The global user database ([see Releases](https://github.com/Leader-board/Wikimedia-statistics/releases/tag/cross_wiki_data)) is about 128 GB, effectively being a 943 x 69 million matrix. This (for me at least) posed challenges of its own, since it's not normal for me to work with databases of this size. Below I give some notes that may help someone who looks at this later.
 
 Note: from GitHub Releases, you will need to join the split files if you want it that way. It's easy on Windows using the ``copy`` command line tool. 
 
@@ -12,7 +12,7 @@ The most fundamental problem with it is that it can only handle 1048576 (2<sup>2
 
 So suppose you are fine with that. Then importing the CSV is pretty easy - the legacy import wizard is often a better choice as that directly imports the CSV to the spreadsheet rather than the "modern" method of creating a "connection". With that, Excel ate up to ~30 GB at times, and stayed at around 15 GB otherwise. Importing is quick (but then you have the row limit).
 
-Once you're done with that, some analysis can be done pretty easily. Load Analytics ToolPak. Then O(*n*) based operations can be done in a reasonable amount of time (for instance, descriptive statistics on *n* columns). However, trying to perform O(*n*<sup>2</sup>) operations (such as trying to compute the covariance matrix for *n* columns) is not worth it for larger values of *n*. The main issue is that Analytics ToolPak is single-threaded. 
+Once you're done with that, some analysis can be done pretty easily. Load Analytics ToolPak. Then O(*n*) based operations can be done in a reasonable amount of time (for instance, descriptive statistics on *n* columns). However, trying to perform O(*n*<sup>2</sup>) operations (such as trying to compute the covariance matrix for *n* columns) is not worth it for larger values of *n*. The main issue is that Analytics ToolPak is single-threaded. Also remember to save the file as .xlsb (binary) - it will use up less space (~1.5 GB from my testing).
 
 <b>What about Access?</b> In theory it would have allowed me to get rid of the row limit of Excel, but Access has a 2 GB file limit which made it pointless...
 
