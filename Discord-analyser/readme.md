@@ -11,6 +11,8 @@ It is also easy to export to CSV, but from my experience this doesn't work as we
 
 This can be customised as necessary. 
 
+The statistical results themselves for the Wikipedia Discord are available at https://github.com/Leader-board/Wikimedia-statistics/releases.
+
 ## Getting the JSON files
 
 Use [DiscordChatExporter](https://github.com/Tyrrrz/DiscordChatExporter). With 10 parallel imports, this took about 3 hours for the Wikipedia Discord, with most of the time being from the new page feed (which is handled by a bot). 
