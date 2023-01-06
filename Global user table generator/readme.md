@@ -32,10 +32,16 @@ This program can be run in much the same way as any Java program. First change t
 
 ```bash
 javac Main.java
-java -Xmx100000M Main
+java -Xmx60000M Main
 ```
 
-It will take ~30 minutes to run, and use a lot of memory (can get up to 100 GB for the full set). If ``-Xmx100000M`` is not set, you will likely get the below error message: ``Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "main"``. As above, if you are running on Toolforge, set up a job rather than running from the terminal, allocating an appropriate amount of memory to the job as before. 
+Assuming this is for the full set, it will take 
+
+* about 10 minutes to import
+* about a few minutes to generate the collated table listing every user's total number of edits across all wikis, sorted
+* a few hours to generate the large matrix showing each user's contribution across every wiki.
+
+It will use a lot of memory (can get up to ~60 GB for the full set). If ``-Xmx60000M`` is not set, you will likely get the below error message: ``Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread "main"``. As above, if you are running on Toolforge, set up a job rather than running from the terminal, allocating an appropriate amount of memory to the job as before. 
 
 ## Accessing the results
 
