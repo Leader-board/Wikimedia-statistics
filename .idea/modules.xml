@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Wikimedia-statistics.iml" filepath="$PROJECT_DIR$/.idea/Wikimedia-statistics.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Global user table generator/ggug.iml" filepath="$PROJECT_DIR$/Global user table generator/ggug.iml" />
     </modules>
   </component>
 </project>

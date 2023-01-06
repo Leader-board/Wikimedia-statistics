@@ -3,13 +3,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
+import gnu.trove.map.TObjectLongMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectLongHashMap;
 
 public class Main {
     /*
      * Input: a directory that leads to each of the files that we want to combine
      */
-    static HashMap<String, HashMap<Integer, Integer>> users = new HashMap<>(); // username is key
-    static HashMap<String, Long> reglook = new HashMap<>(); // username -> registration date (if it exists)
+    static HashMap<String, TIntIntHashMap> users = new HashMap<>(); // username is key
+    static TObjectLongMap<String> reglook = new TObjectLongHashMap<>(); // username -> registration date (if it exists)
     static HashMap<Integer, String> wikinamelookup = new HashMap<>();
     static HashMap<String, Integer> wikiindexlookup = new HashMap<>();
     public static void runner(String location, String filename) {
@@ -36,9 +40,9 @@ public class Main {
                  */
                 if (!values[1].contains("NULL") && !reglook.containsKey(values[0]))
                     reglook.put(values[0], Long.parseLong(values[1]));
-                HashMap<Integer, Integer> P2 = users.get(values[0]);
+                TIntIntHashMap P2 = users.get(values[0]);
                 if (P2 == null)
-                    P2 = new HashMap<>();
+                    P2 = new TIntIntHashMap();
                 // check whether wikiname exists
                 int index = getwikiindex(wikiname);
                 if (index == -1)
@@ -79,7 +83,7 @@ public class Main {
         // the first line should be just printing them
         // Store console print stream.
         // setStream("C:\\Users\\Leaderboard\\Documents\\fulltable.csv");
-        Writer file = new OutputStreamWriter(new FileOutputStream("C:\\Users\\Leaderboard\\Documents\\fulltable.csv"), StandardCharsets.UTF_8);
+        Writer file = new OutputStreamWriter(new FileOutputStream("/vol/bitbucket/dm1321/fulltable.csv"), StandardCharsets.UTF_8);
         BufferedWriter buffer = new BufferedWriter(file, 2000000000);
         buffer.write("Username");
         for (String s : names) {
@@ -94,7 +98,7 @@ public class Main {
             buffer.write(s);
             // check whether a user has an edit at a particular wiki
             int contribs = 0;
-            HashMap<Integer, Integer> hm = users.get(s);
+            TIntIntHashMap hm = users.get(s);
             if (hm != null) {
                 for (String t : names) {
                     String wikiname = t.split("\\.")[0];
@@ -123,8 +127,8 @@ public class Main {
     public static void analyser() throws FileNotFoundException, IOException {
         // INPUT: the users and reglook hashmaps that were computed before
         // OUTPUT: a table showing each user's global contribution
-        HashMap<String, Integer> globalcontribs = new HashMap<>();
-        Writer file = new OutputStreamWriter(new FileOutputStream("C:\\Users\\Leaderboard\\Documents\\globalcontribs.csv"), StandardCharsets.UTF_8);
+        TObjectIntHashMap<String> globalcontribs = new TObjectIntHashMap<>();
+        Writer file = new OutputStreamWriter(new FileOutputStream("/vol/bitbucket/dm1321/globalcontribs.csv"), StandardCharsets.UTF_8);
         BufferedWriter buffer = new BufferedWriter(file, 2000000000);
         for (String s : reglook.keySet()) {
             int contribs = 0;
@@ -168,7 +172,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         // list all the files
         // String loc = "\\\\fs-vol-bitbucket.doc.ic.ac.uk\\bitbucket\\dm1321\\test";
-        String loc = "C:\\Users\\Leaderboard\\Documents\\wikimedia_update";
+        String loc = "/vol/bitbucket/dm1321/wikimedia_update";
         String[] names;
         File f = new File(loc);
         names = f.list();
@@ -177,7 +181,9 @@ public class Main {
             System.out.println(loc + "/" + s + " and number of users till then " + users.size() + " with reglook size " + reglook.size() );
             runner(loc + "/" + s, s);
         }
+        System.out.println("Generating global contributions table");
         analyser();
+        System.out.println("Generating full table matrix");
         generatefulltable(names);
     }
 }
