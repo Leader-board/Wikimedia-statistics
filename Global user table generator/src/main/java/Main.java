@@ -14,6 +14,8 @@ public class Main {
     static TObjectLongMap<String> reglook = new TObjectLongHashMap<>(); // username -> registration date (if it exists)
     static TShortObjectHashMap<String> wikinamelookup = new TShortObjectHashMap<>();
     static TObjectShortHashMap<String> wikiindexlookup = new TObjectShortHashMap<>();
+
+    static final int buffer_size = 500000000;
     public static void runner(String location, String filename) {
         /*
          * Input: filename to the CSV that will be parsed, and the name itself (which
@@ -82,7 +84,7 @@ public class Main {
         // Store console print stream.
         // setStream("C:\\Users\\Leaderboard\\Documents\\fulltable.csv");
         Writer file = new OutputStreamWriter(new FileOutputStream("/vol/bitbucket/dm1321/fulltable.csv"), StandardCharsets.UTF_8);
-        BufferedWriter buffer = new BufferedWriter(file, 2000000000);
+        BufferedWriter buffer = new BufferedWriter(file, buffer_size);
         buffer.write("Username");
         for (String s : names) {
             // get wiki name
@@ -127,7 +129,7 @@ public class Main {
         // OUTPUT: a table showing each user's global contribution
         TObjectIntHashMap<String> globalcontribs = new TObjectIntHashMap<>();
         Writer file = new OutputStreamWriter(new FileOutputStream("/vol/bitbucket/dm1321/globalcontribs.csv"), StandardCharsets.UTF_8);
-        BufferedWriter buffer = new BufferedWriter(file, 2000000000);
+        BufferedWriter buffer = new BufferedWriter(file, buffer_size);
         for (String s : reglook.keySet()) {
             int contribs = 0;
             if (users.containsKey(s)) { // does the user have at least ONE edit?
