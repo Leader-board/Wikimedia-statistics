@@ -4,18 +4,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 import gnu.trove.map.TObjectLongMap;
-import gnu.trove.map.hash.TIntIntHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
-import gnu.trove.map.hash.TObjectLongHashMap;
+import gnu.trove.map.hash.*;
 
 public class Main {
     /*
      * Input: a directory that leads to each of the files that we want to combine
      */
-    static HashMap<String, TIntIntHashMap> users = new HashMap<>(); // username is key
+    static HashMap<String, TShortIntHashMap> users = new HashMap<>(); // username is key
     static TObjectLongMap<String> reglook = new TObjectLongHashMap<>(); // username -> registration date (if it exists)
-    static HashMap<Integer, String> wikinamelookup = new HashMap<>();
-    static HashMap<String, Integer> wikiindexlookup = new HashMap<>();
+    static TShortObjectHashMap<String> wikinamelookup = new TShortObjectHashMap<>();
+    static TObjectShortHashMap<String> wikiindexlookup = new TObjectShortHashMap<>();
     public static void runner(String location, String filename) {
         /*
          * Input: filename to the CSV that will be parsed, and the name itself (which
@@ -40,14 +38,14 @@ public class Main {
                  */
                 if (!values[1].contains("NULL") && !reglook.containsKey(values[0]))
                     reglook.put(values[0], Long.parseLong(values[1]));
-                TIntIntHashMap P2 = users.get(values[0]);
+                TShortIntHashMap P2 = users.get(values[0]);
                 if (P2 == null)
-                    P2 = new TIntIntHashMap();
+                    P2 = new TShortIntHashMap();
                 // check whether wikiname exists
-                int index = getwikiindex(wikiname);
+                short index = getwikiindex(wikiname);
                 if (index == -1)
                 {
-                    index = wikinamelookup.size() + 1;
+                    index = (short) (wikinamelookup.size() + 1);
                     wikinamelookup.put(index, wikiname);
                     wikiindexlookup.put(wikiname, index);
                 }
@@ -72,7 +70,7 @@ public class Main {
         // Set file print stream.
         System.setOut(ps);
     }
-    public static int getwikiindex(String wikiname)
+    public static short getwikiindex(String wikiname)
     {
         if (!wikiindexlookup.containsKey(wikiname))
             return -1;
@@ -98,11 +96,11 @@ public class Main {
             buffer.write(s);
             // check whether a user has an edit at a particular wiki
             int contribs = 0;
-            TIntIntHashMap hm = users.get(s);
+            TShortIntHashMap hm = users.get(s);
             if (hm != null) {
                 for (String t : names) {
                     String wikiname = t.split("\\.")[0];
-                    int wikiindex = getwikiindex(wikiname);
+                    short wikiindex = getwikiindex(wikiname);
                     if (hm.containsKey(wikiindex)) {
                         buffer.write("|" + hm.get(wikiindex));
                         contribs += hm.get(wikiindex);
