@@ -61,17 +61,6 @@ public class Main {
             e.printStackTrace();
         }
     }
-    // taken from the internet
-    public static void setStream(String f) throws FileNotFoundException {
-        File file = new File(f);
-        FileOutputStream fos = new FileOutputStream(file);
-
-        // Create new print stream for file.
-        PrintStream ps = new PrintStream(fos);
-
-        // Set file print stream.
-        System.setOut(ps);
-    }
     public static short getwikiindex(String wikiname)
     {
         if (!wikiindexlookup.containsKey(wikiname))
