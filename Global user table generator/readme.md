@@ -7,6 +7,15 @@ This section contains the source code for a program that takes in a folder conta
 * a full table (spreadsheet-style) that collates the edits users made in each wiki
 * an analytical table that ranks the _global_ edits of each user.
 
+In addition, this information is published on Meta-Wiki, at https://meta.wikimedia.org/w/index.php?title=Global_statistics. The source code for this is available at ``pushtowiki.py``; for that, you need a file called ``botdetails.txt`` with (in separate lines) the API page of the wiki you plan to go to, the bot username and password, and the place you want the bot to print its results to. In this case the data would be 
+
+```
+https://meta.wikimedia.org/w/api.php
+Leaderbot@Statistics_generator [replace with bot username obtained from Special:BotPasswords]
+[bot password]
+Global statistics/
+```
+
 ## Getting started
 
 The first step is to get the number of edits each user made on each wiki (or the wikis you chose). On [Toolforge](https://wikitech.wikimedia.org/wiki/Help:Toolforge), set up a [job](https://wikitech.wikimedia.org/wiki/Help:Toolforge/Grid) to do this. Create a script (see `scripter.sh` in the root) that does the below:
