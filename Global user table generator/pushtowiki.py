@@ -115,7 +115,7 @@ def local_wiki_processing(folderloc):
 def push_to_wiki(page_name, string_to_print):
     S = requests.Session()
 
-    f = open("botdetails.txt", "r")
+    f = open("../../botdetails.txt", "r")
     filecont = f.read().splitlines()
     f.close()
     if (len(filecont) != 4):

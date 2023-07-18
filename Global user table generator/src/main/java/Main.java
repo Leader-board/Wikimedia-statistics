@@ -72,7 +72,7 @@ public class Main {
         // the first line should be just printing them
         // Store console print stream.
         // setStream("C:\\Users\\Leaderboard\\Documents\\fulltable.csv");
-        Writer file = new OutputStreamWriter(new FileOutputStream("/vol/bitbucket/dm1321/fulltable.csv"), StandardCharsets.UTF_8);
+        Writer file = new OutputStreamWriter(new FileOutputStream("/statdata/processed_csv/fulltable.csv"), StandardCharsets.UTF_8);
         BufferedWriter buffer = new BufferedWriter(file, buffer_size);
         buffer.write("Username");
         for (String s : names) {
@@ -117,7 +117,7 @@ public class Main {
         // INPUT: the users and reglook hashmaps that were computed before
         // OUTPUT: a table showing each user's global contribution
         TObjectIntHashMap<String> globalcontribs = new TObjectIntHashMap<>();
-        Writer file = new OutputStreamWriter(new FileOutputStream("/vol/bitbucket/dm1321/globalcontribs.csv"), StandardCharsets.UTF_8);
+        Writer file = new OutputStreamWriter(new FileOutputStream("/statdata/processed_csv/globalcontribs.csv"), StandardCharsets.UTF_8);
         BufferedWriter buffer = new BufferedWriter(file, buffer_size);
         for (String s : reglook.keySet()) {
             int contribs = 0;
@@ -161,7 +161,7 @@ public class Main {
     public static void main(String[] args) throws FileNotFoundException, IOException {
         // list all the files
         // String loc = "\\\\fs-vol-bitbucket.doc.ic.ac.uk\\bitbucket\\dm1321\\test";
-        String loc = "/vol/bitbucket/dm1321/wikimedia_update";
+        String loc = "/statdata/rawcsv";
         String[] names;
         File f = new File(loc);
         names = f.list();
@@ -172,7 +172,7 @@ public class Main {
         }
         System.out.println("Generating global contributions table");
         analyser();
-        System.out.println("Generating full table matrix");
-        generatefulltable(names);
+  //      System.out.println("Generating full table matrix");
+//        generatefulltable(names);
     }
 }
