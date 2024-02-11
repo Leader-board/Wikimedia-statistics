@@ -90,15 +90,15 @@ def add_categories(wiki_name):
 
     r = requests.head(f"https://meta.wikimedia.org/wiki/Category:{category_name}")
     if r.ok:
-        return category_name
+        return f"[[Category:{category_name}]]"
     else:
         return ''
 
 
-def remove_trailing_zeros(str):
+def remove_trailing_zeros(string):
     # 5.4400 should be 5.44
     # https://bobbyhadz.com/blog/python-remove-trailing-zeros-from-decimal
-    return str.rstrip('0').rstrip('.') if '.' in str else str
+    return string.rstrip('0').rstrip('.') if '.' in string else str
 
 
 def convert_to_string_percentile(percentile, edits, wikiname):
@@ -119,15 +119,15 @@ def get_percentile_data(dframe, wikiname):
     edits = []
     while ptr <= 1.0000001:
         bound = math.floor(dframe.iloc[:, len(dframe.columns) - 1].quantile(min(ptr, 1)))
-        if (bound != old_bound):
+        if bound != old_bound:
             old_bound = bound
             percentile.append(round(100 * min(ptr, 1), 5))
             edits.append(bound)
-        if (ptr < 0.65):
+        if ptr < 0.65:
             ptr = ptr + 0.1  # 10%
-        elif (ptr < 0.97):
+        elif ptr < 0.97:
             ptr = ptr + 0.01  # 1%
-        elif (ptr < 0.99):
+        elif ptr < 0.99:
             ptr = ptr + 0.001  # 0.1%
         else:
             ptr = ptr + 0.0001  # 0.01%

@@ -3,7 +3,7 @@ cd /statdata/Wikimedia-statistics
 sentence="$(<wiki_list.txt)"
 # wiki_name = ()
 for i in $sentence;
-do mysql --defaults-file="$HOME"/replica.my.cnf -h "$i".analytics.db.svc.wikimedia.cloud "$i"_p -e "SELECT user_name, user_registration, user_editcount from user ORDER BY user_editcount desc;" > "${!i}".csv;
+do mysql --defaults-file="$HOME"/replica.my.cnf -h "$i".analytics.db.svc.wikimedia.cloud "$i"_p -e "SELECT user_name, user_registration, user_editcount from user ORDER BY user_editcount desc;" > "${i}".csv;
 done
 rm -r ../rawcsv
 mkdir -p ../rawcsv
