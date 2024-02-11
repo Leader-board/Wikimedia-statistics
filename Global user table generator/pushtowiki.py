@@ -98,7 +98,7 @@ def add_categories(wiki_name):
 def remove_trailing_zeros(string):
     # 5.4400 should be 5.44
     # https://bobbyhadz.com/blog/python-remove-trailing-zeros-from-decimal
-    return string.rstrip('0').rstrip('.') if '.' in string else str
+    return string.rstrip('0').rstrip('.') if '.' in string else string
 
 
 def convert_to_string_percentile(percentile, edits, wikiname):
