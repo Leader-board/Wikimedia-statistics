@@ -80,6 +80,7 @@ def add_categories(wiki_name):
     query = ("SELECT dbname, lang, family from wiki")
     cursor.execute(query)
     res = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
+    print(res)
     print(res[res['dbname'] == wiki_name])
     wiki_family = res[res['dbname'] == wiki_name]['family'].item()
     if wiki_family == 'special':
