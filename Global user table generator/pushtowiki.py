@@ -66,6 +66,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     toprint = toprint + '|}\n' + add_categories(wiki_name) if wiki_name is not None else ''
     if rankinc:
+        print(df)
         print(f"first 1000 chars of global: {toprint[:1000]}")
 
     return toprint, df
@@ -80,7 +81,7 @@ def add_categories(wiki_name):
     query = ("SELECT dbname, lang, family from wiki")
     cursor.execute(query)
     res = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
-    print(res)
+    #print(res)
     print(res[res['dbname'] == wiki_name])
     wiki_family = res[res['dbname'] == wiki_name]['family'].item()
     if wiki_family == 'special':
