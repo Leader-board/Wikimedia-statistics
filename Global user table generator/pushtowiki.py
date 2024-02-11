@@ -3,8 +3,7 @@ import requests
 import pandas as pd
 import math
 import csv
-import myloginpath
-import pymysql
+import mysql.connector
 from iso639 import Lang
 
 
@@ -75,9 +74,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 def add_categories(wiki_name):
     # input is something like 'enwiki', 'mlwikisource'
     # find the language
-    conf = myloginpath.parse('client', r'/root/replica.my.cnf')
-    cnx = pymysql.connect(**conf, host='meta.analytics.db.svc.wikimedia.cloud', db='meta_p')
-    # cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', database='meta.analytics.db.svc.wikimedia.cloud')
+    cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', host='meta.analytics.db.svc.wikimedia.cloud', database='meta_p')
     # get the global table
     cursor = cnx.cursor()
     query = ("SELECT dbname, lang, family from wiki")
@@ -110,8 +107,7 @@ def remove_trailing_zeros(string):
 def convert_to_string_percentile(percentile, edits, wikiname):
     toprint = ''
     for i in range(0, len(percentile), 1):
-        toprint = toprint + '|-\n|' + remove_trailing_zeros(str(percentile[i])) + '||' + remove_trailing_zeros(
-            str(edits[i])) + '\n|-\n'
+        toprint = toprint + '|-\n|' + remove_trailing_zeros(str(percentile[i])) + '||' + remove_trailing_zeros(str(edits[i])) + '\n|-\n'
     toprint = toprint + '|}\n\n'
     return header_data_percentile(wikiname) + toprint
 
@@ -153,7 +149,7 @@ def local_wiki_processing(folderloc):
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
-        # print(toprint)
+       # print(toprint)
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
     return percentile_toprint
