@@ -104,8 +104,7 @@ def remove_trailing_zeros(string):
 def convert_to_string_percentile(percentile, edits, wikiname):
     toprint = ''
     for i in range(0, len(percentile), 1):
-        toprint = toprint + '|-\n|' + remove_trailing_zeros(str(percentile[i])) + '||' + remove_trailing_zeros(
-            str(edits[i])) + '\n|-\n'
+        toprint = toprint + '|-\n|' + remove_trailing_zeros(str(percentile[i])) + '||' + remove_trailing_zeros(str(edits[i])) + '\n|-\n'
     toprint = toprint + '|}\n\n'
     return header_data_percentile(wikiname) + toprint
 
@@ -147,7 +146,7 @@ def local_wiki_processing(folderloc):
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
-        print(toprint)
+       # print(toprint)
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
     return percentile_toprint
