@@ -75,7 +75,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 def add_categories(wiki_name):
     # input is something like 'enwiki', 'mlwikisource'
     # find the language
-    conf = myloginpath.parse('client', '/root/replica.my.cnf')
+    conf = myloginpath.parse('client', r'/root/replica.my.cnf')
     cnx = pymysql.connect(**conf, host='meta.analytics.db.svc.wikimedia.cloud', db='meta_p')
     # cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', database='meta.analytics.db.svc.wikimedia.cloud')
     # get the global table
