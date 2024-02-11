@@ -17,25 +17,24 @@ def parse_json(list_loc):
     url = list_loc
     response = urlopen(url)
     data_json = json.loads(response.read())
-    part2 = json.loads(data_json['parse']['wikitext'])['targets'] # as json can't otherwise go that deep
-    number_of_pages = len(part2) # number of users to send to
+    part2 = json.loads(data_json['parse']['wikitext'])['targets']  # as json can't otherwise go that deep
+    number_of_pages = len(part2)  # number of users to send to
     for i in range(0, number_of_pages, 1):
         page_name = part2[i]['title']
         # get the username
-        user_name = re.split('[:\/]', page_name)[1] # https://stackoverflow.com/questions/4998629/split-string-with-multiple-delimiters-in-python
+        user_name = re.split('[:\/]', page_name)[
+            1]  # https://stackoverflow.com/questions/4998629/split-string-with-multiple-delimiters-in-python
         # and run the analysis there
         push_to_wiki(page_name, analyse_user(user_name, '/statdata'))
-
-
 
 
 # input to function: a user
 def percentile_and_user_count(username, fileloc, rankinc):
     # fileloc - absolute location to file
     if (rankinc):
-        df = pd.read_csv(fileloc, on_bad_lines='skip', sep = '|', quoting=csv.QUOTE_NONE)
+        df = pd.read_csv(fileloc, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
     else:
-        df = pd.read_csv(fileloc, on_bad_lines='skip', sep = '\t', quoting=csv.QUOTE_NONE)
+        df = pd.read_csv(fileloc, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
     # we now have dataframe
     # get user details via linear search
     for index, row in df.iterrows():
@@ -45,20 +44,22 @@ def percentile_and_user_count(username, fileloc, rankinc):
         if row[ptr] == username:
             # we've gotten the username!
             # get the details
-            percentile = stats.percentileofscore(df.iloc[:, ptr + 2], int(row[ptr + 2]), kind = 'strict')
-            rank = index # not quite accurate!
+            percentile = stats.percentileofscore(df.iloc[:, ptr + 2], int(row[ptr + 2]), kind='strict')
+            rank = index  # not quite accurate!
             usercount = row[ptr + 2]
             return usercount, rank, percentile
     # user does not exist
     return 0, len(df), 0
 
+
 def header_data(username):
-    return "{{| class=\"wikitable sortable\"\n|+ {} global rank data\n|-\n! Wiki name !! Number of edits !! Approximate rank !! Percentile\n".format(username)
+    return "{{| class=\"wikitable sortable\"\n|+ {} global rank data\n|-\n! Wiki name !! Number of edits !! Approximate rank !! Percentile\n".format(
+        username)
+
 
 def convert_to_string(wikiname, usercount, rank, percentile):
     toprint = '|-\n|' + wikiname + '||' + str(usercount) + '||' + str(rank) + '||' + str(percentile) + '\n|-\n'
     return toprint
-
 
 
 def analyse_user(username, folderloc):
@@ -79,7 +80,7 @@ def analyse_user(username, folderloc):
             usercount, rank, percentile = percentile_and_user_count(username, filename, False)
         # prepare for printing
         if usercount != 0:
-            percentile_toprint+=convert_to_string(page_name, usercount, rank, percentile)
+            percentile_toprint += convert_to_string(page_name, usercount, rank, percentile)
 
     # virtually duplicated code to handle the other folder; can be refactored
     folderloc = oldloc + "/rawcsv"
@@ -98,9 +99,10 @@ def analyse_user(username, folderloc):
             usercount, rank, percentile = percentile_and_user_count(username, filename, False)
         # prepare for printing
         if percentile != 0:
-            percentile_toprint+=convert_to_string(page_name, usercount, rank, percentile)
-    percentile_toprint+='|}\n\n'
+            percentile_toprint += convert_to_string(page_name, usercount, rank, percentile)
+    percentile_toprint += '|}\n\n'
     return percentile_toprint
+
 
 def push_to_wiki(username, string_to_print):
     S = requests.Session()
@@ -120,12 +122,12 @@ def push_to_wiki(username, string_to_print):
         "type": "login",
         "format": "json"
     }
-    #URL = r'https://meta.wikimedia.org/w/api.php'
+    # URL = r'https://meta.wikimedia.org/w/api.php'
     R = S.get(url=URL, params=PARAMS_0)
     DATA = R.json()
 
     LOGIN_TOKEN = DATA['query']['tokens']['logintoken']
-    
+
     # Step 2: POST request to log in. Use of main account for login is not
     # supported. Obtain credentials via Special:BotPasswords
     # (https://www.mediawiki.org/wiki/Special:BotPasswords) for lgname & lgpassword
@@ -162,8 +164,12 @@ def push_to_wiki(username, string_to_print):
     DATA = R.json()
 
     print(DATA)
+
+
 def main():
-    parse_json(r'https://meta.wikimedia.org/w/api.php?action=parse&formatversion=2&page=Global+statistics/Mailing+list&prop=wikitext&format=json')
-    #push_to_wiki('Martin Urbanec', analyse_user('Martin Urbanec', '/statdata'))
+    parse_json(
+        r'https://meta.wikimedia.org/w/api.php?action=parse&formatversion=2&page=Global+statistics/Mailing+list&prop=wikitext&format=json')
+    # push_to_wiki('Martin Urbanec', analyse_user('Martin Urbanec', '/statdata'))
+
 
 main()

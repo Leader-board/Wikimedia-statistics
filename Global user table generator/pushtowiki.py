@@ -142,11 +142,12 @@ def local_wiki_processing(folderloc):
         filename = folderloc + "/" + str(f)
         # print it the same way
         page_name = str(f)[:-4]
-        #    print("Currently processing: {}".format(page_name))
+        print("Currently processing: {}".format(page_name))
         tp, dframe = convert_to_string(filename, False, str(f))
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
+        print(toprint)
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
     return percentile_toprint
@@ -158,7 +159,7 @@ def push_to_wiki(page_name, string_to_print):
     f = open("../../botdetails.txt", "r")
     filecont = f.read().splitlines()
     f.close()
-    if (len(filecont) != 4):
+    if len(filecont) != 4:
         print("The botdetails file is not in the expected format")
         return
     URL = filecont[0]
