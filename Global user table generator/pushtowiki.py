@@ -65,13 +65,16 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
         ptr = ptr + 1
 
     toprint = toprint + '|}\n' + add_categories(wiki_name) if wiki_name is not None else ''
+    if rankinc:
+        print(f"first 1000 chars of global: {toprint[:1000]}")
+
     return toprint, df
 
 
 def add_categories(wiki_name):
     # input is something like 'enwiki', 'mlwikisource'
     # find the language
-    cnx = mysql.connector.connect(option_files='$HOME/replica.my.cnf', database='meta_p')
+    cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', database='meta_p')
     # get the global table
     cursor = cnx.cursor()
     query = ("SELECT dbname, lang, family from wiki")
