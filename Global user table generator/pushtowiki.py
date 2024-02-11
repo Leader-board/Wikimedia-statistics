@@ -3,7 +3,8 @@ import requests
 import pandas as pd
 import math
 import csv
-import mysql.connector
+import myloginpath
+import pymysql
 from iso639 import Lang
 
 
@@ -74,7 +75,9 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 def add_categories(wiki_name):
     # input is something like 'enwiki', 'mlwikisource'
     # find the language
-    cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', database='meta.analytics.db.svc.wikimedia.cloud')
+    conf = myloginpath.parse('/root/replica.my.cnf')
+    cnx = pymysql.connect(**conf, host='meta.analytics.db.svc.wikimedia.cloud', db='meta_p')
+    #cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', database='meta.analytics.db.svc.wikimedia.cloud')
     # get the global table
     cursor = cnx.cursor()
     query = ("SELECT dbname, lang, family from wiki")
