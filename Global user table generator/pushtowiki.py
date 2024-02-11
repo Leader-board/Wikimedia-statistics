@@ -147,7 +147,7 @@ def local_wiki_processing(folderloc):
         # print it the same way
         page_name = str(f)[:-4]
         print("Currently processing: {}".format(page_name))
-        tp, dframe = convert_to_string(filename, False, str(f))
+        tp, dframe = convert_to_string(filename, False, page_name)
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
