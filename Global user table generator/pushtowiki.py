@@ -16,20 +16,27 @@ def header_data_percentile(wikiname):
     return "{{| class=\"wikitable sortable\"\n|+ {} percentile data\n|-\n! Percentile !! Number of edits\n".format(
         wikiname)
 
-def convert_to_string(fileloc, rankinc, wiki_name = None):
+
+def convert_to_string(fileloc, rankinc, wiki_name=None):
     limit = 80000000
-    if rankinc: # global
+    if rankinc:  # global
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
-    else: # local
+    else:  # local
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
+    df = df[df['Edits'] >= 1] # weed out users with no edits
     if not rankinc:
-        df['Rank'] = df['number_of_edits'].rank(method = 'max')
-    df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df["Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
-    toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]}).item()
+        df['Rank'] = df['number_of_edits'].rank(method='max')
+    df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df[
+        "Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
+    toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]})['text'].item()
     toprint = toprint + '|}\n' + add_categories(wiki_name) if wiki_name is not None else ''
     if rankinc:
         print(df)
         print(f"first 1000 chars of global: {toprint[:1000]}")
+
+    # don't forget encoding limit!
+    toprint = toprint.encode('utf-8')[:2096300].decode('utf-8')
+
     return toprint, df
 
 
@@ -91,13 +98,14 @@ def convert_to_string_v0(fileloc, rankinc, wiki_name=None):
 def add_categories(wiki_name):
     # input is something like 'enwiki', 'mlwikisource'
     # find the language
-    cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', host='meta.analytics.db.svc.wikimedia.cloud', database='meta_p')
+    cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', host='meta.analytics.db.svc.wikimedia.cloud',
+                                  database='meta_p')
     # get the global table
     cursor = cnx.cursor()
     query = ("SELECT dbname, lang, family from wiki")
     cursor.execute(query)
     res = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
-    #print(res)
+    # print(res)
     print(res[res['dbname'] == wiki_name])
     wiki_family = res[res['dbname'] == wiki_name]['family'].item()
     if wiki_family == 'special':
@@ -126,7 +134,8 @@ def remove_trailing_zeros(string):
 def convert_to_string_percentile(percentile, edits, wikiname):
     toprint = ''
     for i in range(0, len(percentile), 1):
-        toprint = toprint + '|-\n|' + remove_trailing_zeros(str(percentile[i])) + '||' + remove_trailing_zeros(str(edits[i])) + '\n|-\n'
+        toprint = toprint + '|-\n|' + remove_trailing_zeros(str(percentile[i])) + '||' + remove_trailing_zeros(
+            str(edits[i])) + '\n|-\n'
     toprint = toprint + '|}\n\n'
     return header_data_percentile(wikiname) + toprint
 
@@ -168,7 +177,7 @@ def local_wiki_processing(folderloc):
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
-       # print(toprint)
+        # print(toprint)
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
     return percentile_toprint
