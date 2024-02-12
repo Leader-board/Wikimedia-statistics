@@ -39,9 +39,13 @@ def percentile_and_user_count(username, fileloc, rankinc):
               inplace=True)
     # we now have dataframe
     # get user details via linear search
+    if not rankinc:
+        df['Rank'] = df['Edits'].rank(method='max', ascending=False).astype(int)
+
     df_user = df[df['Username'] == username]
     if len(df_user.index) == 0:
         return 0, len(df), 0
+
     rank = df_user['Rank'].item()
     usercount = df_user['Edits'].item()
     percentile = stats.percentileofscore(df, usercount, kind='strict')
