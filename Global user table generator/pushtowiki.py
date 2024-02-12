@@ -16,8 +16,24 @@ def header_data_percentile(wikiname):
     return "{{| class=\"wikitable sortable\"\n|+ {} percentile data\n|-\n! Percentile !! Number of edits\n".format(
         wikiname)
 
+def convert_to_string(fileloc, rankinc, wiki_name = None):
+    limit = 80000000
+    if rankinc: # global
+        df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
+    else: # local
+        df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
+    if not rankinc:
+        df['Rank'] = df['number_of_edits'].rank(method = 'max')
+    df['output'] = "|" + df['Rank'] + "||" + df['Username'] + "||" + df["Registration_date"] + "||" + df["Edits"]
+    toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]}).item()
+    toprint = toprint + '|}\n' + add_categories(wiki_name) if wiki_name is not None else ''
+    if rankinc:
+        print(df)
+        print(f"first 1000 chars of global: {toprint[:1000]}")
+    return toprint, df
 
-def convert_to_string(fileloc, rankinc, wiki_name=None):
+
+def convert_to_string_v0(fileloc, rankinc, wiki_name=None):
     # wiki_name not required for global_contribs
     # input: a file
     # folder_loc = '/statdata/rawdata'
@@ -36,7 +52,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     ecount = 0
     rank = 0
     for i in df.values:
-        if ptr >= limit or (ptr >= 39500 and len(toprint.encode('utf-8')) > 2096360):
+        if ptr >= limit or (len(toprint.encode('utf-8')) > 2096360):
             break
         row = i.tolist()
         number_of_edits = row[len(row) - 1]
