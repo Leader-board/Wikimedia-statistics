@@ -26,7 +26,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     df.rename(columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
               inplace=True)
     df = df[df['Edits'] >= 1]  # weed out users with no edits
-    df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '0' # remove nan
+    df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '0'  # remove nan
     df['Registration_date'] = df['Registration_date'].astype(int)
     df['Registration_date'] = df['Registration_date'].astype(str)
     df.loc[df['Registration_date'] == '0', 'Registration_date'] = ''
@@ -60,61 +60,6 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     return toprint, df
 
 
-def convert_to_string_v0(fileloc, rankinc, wiki_name=None):
-    # wiki_name not required for global_contribs
-    # input: a file
-    # folder_loc = '/statdata/rawdata'
-    # files = listdir(folder_loc) # get list of files
-    # for f in files:
-    #     filename = folder_loc + '/' + f
-    #     fname = open(filename, "r+")
-    limit = 80000000
-    if rankinc:
-        df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
-    else:
-        df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
-    # take the first N rows
-    toprint = ''
-    ptr = 0
-    ecount = 0
-    rank = 0
-    for i in df.values:
-        if ptr >= limit or (len(toprint.encode('utf-8')) > 2096360):
-            break
-        row = i.tolist()
-        number_of_edits = row[len(row) - 1]
-        if number_of_edits != ecount:
-            # update rank
-            rank = (ptr + 1)
-            ecount = number_of_edits
-        if number_of_edits == 0:
-            break  # no point proceeding from here
-        toprint = toprint + '|-\n|'
-        # if we have only three rows
-        if not rankinc:
-            # then add rank for us
-            toprint = toprint + str(rank) + '||'
-        for j in range(0, len(row), 1):
-            #         if (str(row[j]).isdecimal() and j == len(row) - 2):
-            #            row[j] = int(row[j])
-            if str(row[j]) != 'nan' and isinstance(row[j], float):
-                toprint = toprint + str(int(row[j]))
-            elif str(row[j]) != 'nan':
-                toprint = toprint + str(row[j])
-            if j < len(row) - 1:
-                toprint = toprint + '||'
-
-        toprint = toprint + '\n|-\n'
-        ptr = ptr + 1
-
-    toprint = toprint + '|}\n' + add_categories(wiki_name) if wiki_name is not None else ''
-    if rankinc:
-        print(df)
-        print(f"first 1000 chars of global: {toprint[:1000]}")
-
-    return toprint, df
-
-
 def add_categories(wiki_name):
     # input is something like 'enwiki', 'mlwikisource'
     # find the language
@@ -134,7 +79,7 @@ def add_categories(wiki_name):
     try:
         full_lang_name = Lang(wiki_lang).name
     except:
-        return '' # for invalid langs
+        return ''  # for invalid langs
 
     category_name = f"{full_lang_name} {wiki_family.capitalize()}"
 
