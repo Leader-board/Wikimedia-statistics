@@ -48,6 +48,8 @@ def percentile_and_user_count(username, fileloc, rankinc):
 
     rank = df_user['Rank'].item()
     usercount = df_user['Edits'].item()
+    print(usercount)
+    print(df_user)
     percentile = stats.percentileofscore(df['Edits'], usercount, kind='strict')
     return usercount, rank, percentile
 
