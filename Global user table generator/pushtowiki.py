@@ -49,8 +49,8 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
-    print(f"first 1000 chars of global: {toprint[:1000].encode("unicode_escape")}")
-    print(f"last 1000 chars of global: {toprint[:-1000].encode("unicode_escape")}")
+    print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
+    print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
 
     return toprint, df
 
