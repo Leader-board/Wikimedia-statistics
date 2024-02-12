@@ -29,10 +29,11 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df[
         "Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
     toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]})['text'].item()
-    toprint = toprint + '|}\n' + add_categories(wiki_name) if wiki_name is not None else ''
+    toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
     if rankinc:
         print(df)
         print(f"first 1000 chars of global: {toprint[:1000]}")
+        print(f"last 1000 chars of global: {toprint[:-1000]}")
 
     # don't forget encoding limit!
     toprint = toprint.encode('utf-8')[:2096300].decode('utf-8')
