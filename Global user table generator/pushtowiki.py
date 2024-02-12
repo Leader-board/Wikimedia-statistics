@@ -34,11 +34,6 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     toprint = toprint.encode('utf-8')[:2096300].decode('utf-8')
 
-    if rankinc:
-        print(df)
-        print(f"first 1000 chars of global: {toprint[:1000]}")
-        print(f"last 1000 chars of global: {toprint[:-1000]}")
-
     # remove the last new irrelevant characters if needed
 
     if len(toprint.encode('utf-8')) > 2096250:
@@ -46,6 +41,10 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
             toprint = toprint[:-1]
 
     toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
+
+    print(df)
+    print(f"first 1000 chars of global: {toprint[:1000]}")
+    print(f"last 1000 chars of global: {toprint[:-1000]}")
 
     return toprint, df
 
@@ -158,7 +157,8 @@ def get_percentile_data(dframe, wikiname):
     percentile = []
     edits = []
     while ptr <= 1.0000001:
-        bound = math.floor(dframe.iloc[:, len(dframe.columns) - 1].quantile(min(ptr, 1)))
+        #bound = math.floor(dframe.iloc[:, len(dframe.columns) - 1].quantile(min(ptr, 1)))
+        bound = math.floor(dframe['Edits'].quantile(min(ptr, 1)))
         if bound != old_bound:
             old_bound = bound
             percentile.append(round(100 * min(ptr, 1), 5))
