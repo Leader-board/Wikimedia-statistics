@@ -29,25 +29,25 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '' # remove nan
 
     if not rankinc:
-        df['Rank'] = df['Edits'].rank(method='max', ascending='False')
+        df['Rank'] = df['Edits'].rank(method='max', ascending=False).astype(int)
     df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df[
         "Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
     toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]})['text'].item()
 
     # don't forget encoding limit!
 
-    toprint = toprint.encode('utf-8')[:2096600].decode('utf-8')
+    toprint = toprint.encode('utf-8')[:2096800].decode('utf-8')
 
     # remove the last new irrelevant characters if needed
 
     ptr = 0
-    if len(toprint.encode('utf-8')) > 2096600:
-        while ptr < 2:
-            if toprint[len(toprint) - 1] != '\\n':
-                toprint = toprint[:-1]
-            else:
-                toprint = toprint[:-1]
-                ptr += 1
+    # if len(toprint.encode('utf-8')) > 2096700:
+    #     while ptr < 2:
+    #         if toprint[len(toprint) - 1] != '\\n':
+    #             toprint = toprint[:-1]
+    #         else:
+    #             toprint = toprint[:-1]
+    #             ptr += 1
 
     toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 

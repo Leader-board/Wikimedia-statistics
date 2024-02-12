@@ -31,25 +31,19 @@ def parse_json(list_loc):
 # input to function: a user
 def percentile_and_user_count(username, fileloc, rankinc):
     # fileloc - absolute location to file
-    if (rankinc):
+    if rankinc:
         df = pd.read_csv(fileloc, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
     else:
         df = pd.read_csv(fileloc, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
     # we now have dataframe
     # get user details via linear search
-    for index, row in df.iterrows():
-        ptr = 0
-        if rankinc:
-            ptr = 1
-        if row[ptr] == username:
-            # we've gotten the username!
-            # get the details
-            percentile = stats.percentileofscore(df.iloc[:, ptr + 2], int(row[ptr + 2]), kind='strict')
-            rank = index  # not quite accurate!
-            usercount = row[ptr + 2]
-            return usercount, rank, percentile
-    # user does not exist
-    return 0, len(df), 0
+    df_user = df[df['Username'] == username]
+    if len(df_user.index) == 0:
+        return 0, len(df), 0
+    rank = df_user['Rank'].item()
+    usercount = df_user['Edits'].item()
+    percentile = stats.percentileofscore(df, usercount, kind='strict')
+    return usercount, rank, percentile
 
 
 def header_data(username):
