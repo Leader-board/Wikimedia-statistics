@@ -8,7 +8,7 @@ from iso639 import Lang
 
 
 def header_data(wikiname):
-    return "{{| class=\"wikitable sortable\"\n|+ {} user rank data\n|-\n! Rank !! Username !! Registration date !! Number of edits\n".format(
+    return "{{| class=\"wikitable sortable\"\n|+ {} user rank data\n|-\n! Rank !! Username !! Registration date !! Number of edits\n|-\n".format(
         wikiname)
 
 
@@ -34,14 +34,14 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     # don't forget encoding limit!
 
-    toprint = toprint.encode('utf-8')[:2096300].decode('utf-8')
+    toprint = toprint.encode('utf-8')[:2096600].decode('utf-8')
 
     # remove the last new irrelevant characters if needed
 
     ptr = 0
-    if len(toprint.encode('utf-8')) > 2096280:
+    if len(toprint.encode('utf-8')) > 2096600:
         while ptr < 2:
-            if toprint[len(toprint) - 1] != '\n':
+            if toprint[len(toprint) - 1] != '\\n':
                 toprint = toprint[:-1]
             else:
                 toprint = toprint[:-1]
@@ -49,8 +49,8 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
-    print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
-    print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
+    # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
+    # print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
 
     return toprint, df
 
@@ -133,7 +133,7 @@ def add_categories(wiki_name):
 
     # now check whether this category exists in meta-wiki
 
-    r = requests.head(f"https://meta.wikimedia.org/wiki/Category:{category_name}")
+    r = requests.get(f"https://meta.wikimedia.org/wiki/Category:{category_name}")
     if r.ok:
         return f"[[Category:{category_name}]]"
     else:
