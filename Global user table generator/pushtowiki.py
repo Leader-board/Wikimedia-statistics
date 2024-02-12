@@ -23,12 +23,12 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
     else:  # local
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
-    df.rename(columns={"user_name": "Name", "user_registration": "Registration_date", "user_editcount": "Edits"},
+    df.rename(columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
               inplace=True)
     df = df[df['Edits'] >= 1]  # weed out users with no edits
     if not rankinc:
         df['Rank'] = df['Edits'].rank(method='max')
-    df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Name'].astype(str) + "||" + df[
+    df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df[
         "Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
     toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]})['text'].item()
 
