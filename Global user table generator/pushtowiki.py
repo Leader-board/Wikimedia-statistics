@@ -36,7 +36,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     # don't forget encoding limit!
 
-    toprint = toprint.encode('utf-8')[:2096800].decode('utf-8')
+    toprint = toprint.encode('utf-8')[:2096900].decode('utf-8')
 
     # remove the last new irrelevant characters if needed
 
@@ -49,7 +49,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     #             toprint = toprint[:-1]
     #             ptr += 1
 
-    toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
+    toprint = toprint + '\n|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
     # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
     # print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
@@ -128,7 +128,10 @@ def add_categories(wiki_name):
         # not a content wiki
         return ''
     wiki_lang = res[res['dbname'] == wiki_name]['lang'].item()
-    full_lang_name = Lang(wiki_lang).name
+    try:
+        full_lang_name = Lang(wiki_lang).name
+    except:
+        return '' # for invalid langs
 
     category_name = f"{full_lang_name} {wiki_family.capitalize()}"
 
