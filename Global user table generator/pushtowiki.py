@@ -24,7 +24,7 @@ def convert_to_string(fileloc, rankinc, wiki_name = None):
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
     if not rankinc:
         df['Rank'] = df['number_of_edits'].rank(method = 'max')
-    df['output'] = "|" + df['Rank'] + "||" + df['Username'] + "||" + df["Registration_date"] + "||" + df["Edits"]
+    df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df["Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
     toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]}).item()
     toprint = toprint + '|}\n' + add_categories(wiki_name) if wiki_name is not None else ''
     if rankinc:
