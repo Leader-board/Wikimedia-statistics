@@ -41,7 +41,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     # remove the last new irrelevant characters if needed
 
-    if toprint.encode('utf-8') > 2096250:
+    if len(toprint.encode('utf-8')) > 2096250:
         while toprint[len(toprint) - 1] != '\n':
             toprint = toprint[:-1]
 
