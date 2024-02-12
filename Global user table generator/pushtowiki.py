@@ -28,7 +28,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     df = df[df['Edits'] >= 1]  # weed out users with no edits
     if not rankinc:
         df['Rank'] = df['Edits'].rank(method='max')
-    df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df[
+    df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Name'].astype(str) + "||" + df[
         "Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
     toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]})['text'].item()
 
@@ -43,12 +43,14 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
         while ptr < 2:
             if toprint[len(toprint) - 1] != '\n':
                 toprint = toprint[:-1]
+            else:
+                toprint = toprint[:-1]
                 ptr += 1
 
     toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
-    print(fr"first 1000 chars of global: {toprint[:1000]}")
-    print(fr"last 1000 chars of global: {toprint[:-1000]}")
+    print(f"first 1000 chars of global: {toprint[:1000].encode("unicode_escape")}")
+    print(f"last 1000 chars of global: {toprint[:-1000].encode("unicode_escape")}")
 
     return toprint, df
 
