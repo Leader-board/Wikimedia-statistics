@@ -26,8 +26,10 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     df.rename(columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
               inplace=True)
     df = df[df['Edits'] >= 1]  # weed out users with no edits
+    df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '' # remove nan
+
     if not rankinc:
-        df['Rank'] = df['Edits'].rank(method='max')
+        df['Rank'] = df['Edits'].rank(method='max', ascending='False')
     df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df[
         "Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
     toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]})['text'].item()
@@ -121,7 +123,6 @@ def add_categories(wiki_name):
     cursor.execute(query)
     res = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
     # print(res)
-    print(res[res['dbname'] == wiki_name])
     wiki_family = res[res['dbname'] == wiki_name]['family'].item()
     if wiki_family == 'special':
         # not a content wiki
