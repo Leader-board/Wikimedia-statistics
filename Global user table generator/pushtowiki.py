@@ -26,7 +26,10 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     df.rename(columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
               inplace=True)
     df = df[df['Edits'] >= 1]  # weed out users with no edits
-    df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '' # remove nan
+    df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '0' # remove nan
+    df['Registration_date'] = df['Registration_date'].astype(int)
+    df['Registration_date'] = df['Registration_date'].astype(str)
+    df.loc[df['Registration_date'] == '0', 'Registration_date'] = ''
 
     if not rankinc:
         df['Rank'] = df['Edits'].rank(method='max', ascending=False).astype(int)
