@@ -23,21 +23,29 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
     else:  # local
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
-    df = df[df['Edits'] >= 1] # weed out users with no edits
+    df = df[df['Edits'] >= 1]  # weed out users with no edits
     if not rankinc:
         df['Rank'] = df['number_of_edits'].rank(method='max')
     df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df[
         "Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
     toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]})['text'].item()
-    toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
     # don't forget encoding limit!
+
     toprint = toprint.encode('utf-8')[:2096300].decode('utf-8')
 
     if rankinc:
         print(df)
         print(f"first 1000 chars of global: {toprint[:1000]}")
         print(f"last 1000 chars of global: {toprint[:-1000]}")
+
+    # remove the last new irrelevant characters if needed
+
+    if toprint.encode('utf-8') > 2096250:
+        while toprint[len(toprint) - 1] != '\n':
+            toprint = toprint[:-1]
+
+    toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
     return toprint, df
 
