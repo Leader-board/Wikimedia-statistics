@@ -35,6 +35,8 @@ def percentile_and_user_count(username, fileloc, rankinc):
         df = pd.read_csv(fileloc, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
     else:
         df = pd.read_csv(fileloc, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
+    df.rename(columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
+              inplace=True)
     # we now have dataframe
     # get user details via linear search
     df_user = df[df['Username'] == username]
