@@ -23,6 +23,8 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='|', quoting=csv.QUOTE_NONE)
     else:  # local
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
+    df.rename(columns={"user_name": "Name", "user_registration": "Registration_date", "user_editcount": "Edits"},
+              inplace=True)
     df = df[df['Edits'] >= 1]  # weed out users with no edits
     if not rankinc:
         df['Rank'] = df['number_of_edits'].rank(method='max')
@@ -36,15 +38,14 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     # remove the last new irrelevant characters if needed
 
-    if len(toprint.encode('utf-8')) > 2096250:
+    if len(toprint.encode('utf-8')) > 2096280:
         while toprint[len(toprint) - 1] != '\n':
             toprint = toprint[:-1]
 
     toprint = toprint + '|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
-    print(df)
-    print(f"first 1000 chars of global: {toprint[:1000]}")
-    print(f"last 1000 chars of global: {toprint[:-1000]}")
+    print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
+    print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
 
     return toprint, df
 
@@ -157,7 +158,7 @@ def get_percentile_data(dframe, wikiname):
     percentile = []
     edits = []
     while ptr <= 1.0000001:
-        #bound = math.floor(dframe.iloc[:, len(dframe.columns) - 1].quantile(min(ptr, 1)))
+        # bound = math.floor(dframe.iloc[:, len(dframe.columns) - 1].quantile(min(ptr, 1)))
         bound = math.floor(dframe['Edits'].quantile(min(ptr, 1)))
         if bound != old_bound:
             old_bound = bound
