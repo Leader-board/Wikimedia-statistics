@@ -40,18 +40,6 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     # don't forget encoding limit!
 
     toprint = toprint.encode('utf-8')[:2096900].decode('utf-8')
-
-    # remove the last new irrelevant characters if needed
-
-    ptr = 0
-    # if len(toprint.encode('utf-8')) > 2096700:
-    #     while ptr < 2:
-    #         if toprint[len(toprint) - 1] != '\\n':
-    #             toprint = toprint[:-1]
-    #         else:
-    #             toprint = toprint[:-1]
-    #             ptr += 1
-
     toprint = toprint + '\n|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
     # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
@@ -65,23 +53,35 @@ def add_categories(wiki_name):
     # find the language
     cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', host='meta.analytics.db.svc.wikimedia.cloud',
                                   database='meta_p')
+
+    # handle exceptions
+    exception_wikiname = dict(simplewiki='Simple English Wikipedia', simplewikibooks='Simple English Wikibooks',
+                              simplewikiquote='Simple English Wikiquote', simplewiktionary='Simple English Wiktionary',
+                              donatewiki='Fundraising')
+
     # get the global table
     cursor = cnx.cursor()
-    query = ("SELECT dbname, lang, family from wiki")
+    query = ("SELECT dbname, lang, family, name from wiki")
     cursor.execute(query)
     res = pd.DataFrame(cursor.fetchall(), columns=[desc[0] for desc in cursor.description])
     # print(res)
     wiki_family = res[res['dbname'] == wiki_name]['family'].item()
-    if wiki_family == 'special':
+    if wiki_family == 'special' or wiki_name in exception_wikiname:
         # not a content wiki
-        return ''
-    wiki_lang = res[res['dbname'] == wiki_name]['lang'].item()
-    try:
-        full_lang_name = Lang(wiki_lang).name
-    except:
-        return ''  # for invalid langs
+        if wiki_name in exception_wikiname:
+            full_name = exception_wikiname[wiki_name]
+        else:
+            # get full name from database
+            full_name = res[res['dbname'] == wiki_name]['name'].item()
+        category_name = f"{full_name}"
 
-    category_name = f"{full_lang_name} {wiki_family.capitalize()}"
+    else:
+        wiki_lang = res[res['dbname'] == wiki_name]['lang'].item()
+        try:
+            full_lang_name = Lang(wiki_lang).name
+        except:
+            return ''  # for invalid langs
+        category_name = f"{full_lang_name} {wiki_family.capitalize()}"
 
     # now check whether this category exists in meta-wiki
 
