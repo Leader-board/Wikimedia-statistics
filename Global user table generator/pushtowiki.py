@@ -35,11 +35,22 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
         df['Rank'] = df['Edits'].rank(method='max', ascending=False).astype(int)
     df['output'] = "|" + df['Rank'].astype(str) + "||" + df['Username'].astype(str) + "||" + df[
         "Registration_date"].astype(str) + "||" + df["Edits"].astype(str)
+
+    # https://stackoverflow.com/a/77999077/19370273
+    # only consider complete rows
+    df['str_length'] = df['output'].str.encode('utf-8').len()  # create column with length of strings
+    df['str_length_cum'] = df['str_length'].cumsum()  # create column with cumulative length of strings
+    df = df[df['str_length_cum'] < 2096900]  # filter with threshold
+    del (df['str_length'])
+    del (df['str_length_cum'])
+
+    # convert to string
+
     toprint = pd.DataFrame({'text': ['\n|-\n'.join(df['output'].str.strip('"').tolist())]})['text'].item()
 
     # don't forget encoding limit!
 
-    toprint = toprint.encode('utf-8')[:2096900].decode('utf-8')
+    #toprint = toprint.encode('utf-8')[:2096900].decode('utf-8')
     toprint = toprint + '\n|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
     # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
