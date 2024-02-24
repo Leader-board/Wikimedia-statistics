@@ -50,7 +50,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     # don't forget encoding limit!
 
-    #toprint = toprint.encode('utf-8')[:2096900].decode('utf-8')
+    # toprint = toprint.encode('utf-8')[:2096900].decode('utf-8')
     toprint = toprint + '\n|}\n' + (add_categories(wiki_name) if wiki_name is not None else '')
 
     # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
@@ -125,6 +125,8 @@ def get_percentile_data(dframe, wikiname):
     old_bound = -1
     percentile = []
     edits = []
+    dframe.rename(columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
+              inplace=True)
     while ptr <= 1.0000001:
         # bound = math.floor(dframe.iloc[:, len(dframe.columns) - 1].quantile(min(ptr, 1)))
         bound = math.floor(dframe['Edits'].quantile(min(ptr, 1)))
