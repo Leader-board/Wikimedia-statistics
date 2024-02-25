@@ -68,7 +68,7 @@ def add_categories(wiki_name):
     # handle exceptions
     exception_wikiname = dict(simplewiki='Simple English Wikipedia', simplewikibooks='Simple English Wikibooks',
                               simplewikiquote='Simple English Wikiquote', simplewiktionary='Simple English Wiktionary',
-                              donatewiki='Fundraising')
+                              donatewiki='Fundraising', wikimaniawiki = 'Wikimania', wikimania2018='Wikimania 2018', wikimania2017='Wikimania 2017', wikimania2016='Wikimania 2016', wikimania2015='Wikimania 2015')
 
     # get the global table
     cursor = cnx.cursor()
