@@ -40,7 +40,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     # only consider complete rows
     df['str_length'] = df['output'].str.encode('utf-8').str.len()  # create column with length of strings
     df['str_length_cum'] = df['str_length'].cumsum()  # create column with cumulative length of strings
-    df = df[df['str_length_cum'] < 2070000]  # filter with threshold
+    df = df[df['str_length_cum'] <= 1920000]  # filter with threshold
     del (df['str_length'])
     del (df['str_length_cum'])
 
@@ -68,7 +68,14 @@ def add_categories(wiki_name):
     # handle exceptions
     exception_wikiname = dict(simplewiki='Simple English Wikipedia', simplewikibooks='Simple English Wikibooks',
                               simplewikiquote='Simple English Wikiquote', simplewiktionary='Simple English Wiktionary',
-                              donatewiki='Fundraising', wikimaniawiki = 'Wikimania', wikimania2018='Wikimania 2018', wikimania2017='Wikimania 2017', wikimania2016='Wikimania 2016', wikimania2015='Wikimania 2015')
+                              donatewiki='Fundraising', wikimaniawiki = 'Wikimania', wikimania2018wiki='Wikimania 2018',
+                              wikimania2017wiki='Wikimania 2017', wikimania2016wiki='Wikimania 2016',
+                              wikimania2015wiki='Wikimania 2015', wikimania2014wiki='Wikimania 2014',
+                              wikimania2013wiki='Wikimania 2013', wikimania2012wiki='Wikimania 2012',
+                              wikimania2011wiki='Wikimania 2011', wikimania2010wiki='Wikimania 2010',
+                              wikimania2009wiki='Wikimania 2009', wikimania2008wiki='Wikimania 2018',
+                              wikimania2007wiki='Wikimania 2007', wikimania2006wiki='Wikimania 2006',
+                              wikimania2005wiki='Wikimania 2005')
 
     # get the global table
     cursor = cnx.cursor()
