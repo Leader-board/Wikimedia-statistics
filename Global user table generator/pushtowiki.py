@@ -38,9 +38,9 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     # https://stackoverflow.com/a/77999077/19370273
     # only consider complete rows
-    df['str_length'] = df['output'].str.encode('utf-8').str.len()  # create column with length of strings
+    df['str_length'] = df['output'].str.encode('utf-8').str.len() + 4 # create column with length of strings, +4 for \n|-\n
     df['str_length_cum'] = df['str_length'].cumsum()  # create column with cumulative length of strings
-    df = df[df['str_length_cum'] <= 1920000]  # filter with threshold
+    df = df[df['str_length_cum'] <= 2096800]  # filter with threshold
     del (df['str_length'])
     del (df['str_length_cum'])
 
