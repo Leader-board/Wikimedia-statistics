@@ -164,10 +164,12 @@ def get_percentile_data(dframe, wikiname):
 def graph_data(df, wiki_name):
     print(f"Graphing {wiki_name}")
     sns.histplot(data=df, x='Edits', kde=True, log_scale=True).set(title=f'{wiki_name} edit count')
-    plt.savefig("tempgraph.png")
-    upload_file('tempgraph.png', f'{wiki_name} edit count')
-    push_to_wiki(f'File:{wiki_name} edit count.png',
-                 f'Edit count for {wiki_name} \n \n [[Category: Global statistics]]', upload=True)
+    plt.savefig("tempgraph.svg")
+    upload_file('tempgraph.svg', f'{wiki_name} edit count')
+    push_to_wiki(f'File:{wiki_name} edit count.svg',
+                 f'{{Information\n|description=Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]\n|date=tbd\n|source={{own}}\nauthor=[[User:Leaderbot|Leaderbot]]\n'
+                 f'{{self|cc-by-sa-4.0}}\n'
+                 f'\n[[Category: Global statistics]]', upload=True)
 
 
 def local_wiki_processing(folderloc):
@@ -251,7 +253,7 @@ def upload_file(filename, upload_name):
     # Step 4: Post request to upload a file directly
     PARAMS_4 = {
         "action": "upload",
-        "filename": f"{upload_name}.png",
+        "filename": f"{upload_name}.svg",
         "format": "json",
         "token": CSRF_TOKEN,
         "ignorewarnings": 1  # overwriting is expected
@@ -290,6 +292,7 @@ def main():
     fileloc = '/statdata/processed_csv/globalcontribs.csv'
     # H://testdata.txt
     stp, df, graph_df = convert_to_string(fileloc, True)
+    graph_data(graph_df, 'Global')
     string_to_print = header_data('Global') + stp
     push_to_wiki("Rank data/Global", string_to_print)
     percentile_toprint = '=={}==\n\n'.format("Global") + get_percentile_data(df, "Global") + local_wiki_processing(
