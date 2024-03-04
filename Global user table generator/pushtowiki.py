@@ -156,10 +156,8 @@ def get_percentile_data(dframe, wikiname):
             ptr = ptr + 0.1  # 10%
         elif ptr < 0.97:
             ptr = ptr + 0.01  # 1%
-        elif ptr < 0.99:
-            ptr = ptr + 0.001  # 0.1%
         else:
-            ptr = ptr + 0.0001  # 0.01%
+            ptr = ptr + 0.001  # 0.1%
     return convert_to_string_percentile(percentile, edits, wikiname)
 
 
