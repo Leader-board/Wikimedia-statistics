@@ -163,8 +163,8 @@ def get_percentile_data(dframe, wikiname):
 
 def graph_data(df, wiki_name):
     print(f"Graphing {wiki_name}")
-    edit_cnts = sns.load_dataset(df['Edits'])
-    sns.histplot(data=edit_cnts, x='Number of edits', kde=True, log_scale=True).set(title=f'{wiki_name} edit count')
+    edit_cnts = sns.load_dataset(df)
+    sns.histplot(data=edit_cnts, x='Edits', kde=True, log_scale=True).set(title=f'{wiki_name} edit count')
     plt.savefig("tempgraph.png")
     upload_file('tempgraph.png', f'{wiki_name} edit count')
     push_to_wiki(f'File:{wiki_name} edit count.png',
@@ -287,7 +287,7 @@ def push_to_wiki(page_name, string_to_print):
 def main():
     fileloc = '/statdata/processed_csv/globalcontribs.csv'
     # H://testdata.txt
-    stp, df = convert_to_string(fileloc, True)
+    stp, df, graph_df = convert_to_string(fileloc, True)
     string_to_print = header_data('Global') + stp
     push_to_wiki("Rank data/Global", string_to_print)
     percentile_toprint = '=={}==\n\n'.format("Global") + get_percentile_data(df, "Global") + local_wiki_processing(
