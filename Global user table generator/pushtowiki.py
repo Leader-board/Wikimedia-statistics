@@ -179,6 +179,7 @@ def local_wiki_processing(folderloc):
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
+        graph_data(dframe, page_name)
         # print(toprint)
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
