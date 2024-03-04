@@ -6,6 +6,8 @@ import csv
 import mysql.connector
 import seaborn as sns
 import matplotlib.pyplot as plt
+from datetime import date
+
 import os
 
 from iso639 import Lang
@@ -31,7 +33,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
               inplace=True)
     # df on its own is useful when graphing
 
-    #full_df = df.copy(deep=True)
+    full_df = df.copy(deep=True)
 
     df = df[df['Edits'] >= 1]  # weed out users with no edits
     df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '0'  # remove nan
@@ -65,7 +67,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
     # print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
 
-    return toprint, df, df
+    return toprint, df, full_df
 
 
 def add_categories(wiki_name):
@@ -168,7 +170,7 @@ def graph_data(df, wiki_name):
     plt.savefig("tempgraph.svg")
     upload_file('tempgraph.svg', f'{wiki_name} edit count')
     push_to_wiki(f'File:{wiki_name} edit count.svg',
-                 f'{{{{Information\n|description=Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]\n|date=tbd\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
+                 f'{{{{Information\n|description={{{{en|Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]}}}}\n|date={{date.today()}}\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
                  f'{{{{self|cc-by-sa-4.0}}}}\n'
                  f'\n[[Category: Global statistics]]', upload=True)
     plt.clf()
