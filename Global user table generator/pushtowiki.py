@@ -28,6 +28,10 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
         df = pd.read_csv(fileloc, nrows=limit, on_bad_lines='skip', sep='\t', quoting=csv.QUOTE_NONE)
     df.rename(columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
               inplace=True)
+    # df on its own is useful when graphing
+
+    full_df = df.copy(deep=True)
+
     df = df[df['Edits'] >= 1]  # weed out users with no edits
     df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '0'  # remove nan
     df['Registration_date'] = df['Registration_date'].astype(int)
@@ -60,7 +64,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
     # print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
 
-    return toprint, df
+    return toprint, df, full_df
 
 
 def add_categories(wiki_name):
@@ -176,11 +180,11 @@ def local_wiki_processing(folderloc):
         # print it the same way
         page_name = str(f)[:-4]
         print("Currently processing: {}".format(page_name))
-        tp, dframe = convert_to_string(filename, False, page_name)
+        tp, dframe, graph_df = convert_to_string(filename, False, page_name)
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
-        graph_data(dframe, page_name)
+        graph_data(graph_df, page_name)
         # print(toprint)
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
