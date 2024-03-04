@@ -4,6 +4,9 @@ import pandas as pd
 import math
 import csv
 import mysql.connector
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 from iso639 import Lang
 
 
@@ -38,7 +41,8 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 
     # https://stackoverflow.com/a/77999077/19370273
     # only consider complete rows
-    df['str_length'] = df['output'].str.encode('utf-8').str.len() + 4 # create column with length of strings, +4 for \n|-\n
+    df['str_length'] = df['output'].str.encode(
+        'utf-8').str.len() + 4  # create column with length of strings, +4 for \n|-\n
     df['str_length_cum'] = df['str_length'].cumsum()  # create column with cumulative length of strings
     df = df[df['str_length_cum'] <= 2096900]  # filter with threshold
     del (df['str_length'])
@@ -68,7 +72,7 @@ def add_categories(wiki_name):
     # handle exceptions
     exception_wikiname = dict(simplewiki='Simple English Wikipedia', simplewikibooks='Simple English Wikibooks',
                               simplewikiquote='Simple English Wikiquote', simplewiktionary='Simple English Wiktionary',
-                              donatewiki='Fundraising', wikimaniawiki = 'Wikimania', wikimania2018wiki='Wikimania 2018',
+                              donatewiki='Fundraising', wikimaniawiki='Wikimania', wikimania2018wiki='Wikimania 2018',
                               wikimania2017wiki='Wikimania 2017', wikimania2016wiki='Wikimania 2016',
                               wikimania2015wiki='Wikimania 2015', wikimania2014wiki='Wikimania 2014',
                               wikimania2013wiki='Wikimania 2013', wikimania2012wiki='Wikimania 2012',
@@ -132,8 +136,9 @@ def get_percentile_data(dframe, wikiname):
     old_bound = -1
     percentile = []
     edits = []
-    dframe.rename(columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
-              inplace=True)
+    dframe.rename(
+        columns={"user_name": "Username", "user_registration": "Registration_date", "user_editcount": "Edits"},
+        inplace=True)
     while ptr <= 1.0000001:
         # bound = math.floor(dframe.iloc[:, len(dframe.columns) - 1].quantile(min(ptr, 1)))
         bound = math.floor(dframe['Edits'].quantile(min(ptr, 1)))
@@ -150,6 +155,15 @@ def get_percentile_data(dframe, wikiname):
         else:
             ptr = ptr + 0.0001  # 0.01%
     return convert_to_string_percentile(percentile, edits, wikiname)
+
+
+def graph_data(df, wiki_name):
+    edit_cnts = sns.load_dataset(df['Edits'])
+    sns.histplot(data=edit_cnts, x='Number of edits', kde=True, log_scale=True).set(title=f'{wiki_name} edit count')
+    plt.savefig("tempgraph.png")
+    upload_file('tempgraph.png', f'{wiki_name} edit count')
+    push_to_wiki(f'File:{wiki_name} edit count.png',
+                 f'Edit count for {wiki_name} \n \n [[Category: Global statistics]]')
 
 
 def local_wiki_processing(folderloc):
@@ -169,20 +183,23 @@ def local_wiki_processing(folderloc):
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
 
-    percentile_toprint = percentile_toprint.encode('utf-8')[:2096900].decode('utf-8') # running into length limit
+    percentile_toprint = percentile_toprint.encode('utf-8')[:2096900].decode('utf-8')  # running into length limit
     return percentile_toprint
 
 
-def push_to_wiki(page_name, string_to_print):
+def get_token(upload):
     S = requests.Session()
 
     f = open("../../botdetails.txt", "r")
     filecont = f.read().splitlines()
     f.close()
-    if len(filecont) != 4:
+    if len(filecont) != 5:
         print("The botdetails file is not in the expected format")
         return
-    URL = filecont[0]
+    if upload:
+        URL = filecont[0]
+    else:
+        URL = filecont[4]
     # Step 1: GET request to fetch login token
     PARAMS_0 = {
         "action": "query",
@@ -220,6 +237,30 @@ def push_to_wiki(page_name, string_to_print):
     DATA = R.json()
 
     CSRF_TOKEN = DATA['query']['tokens']['csrftoken']
+
+    return CSRF_TOKEN, URL, S
+
+
+def upload_file(filename, upload_name):
+    CSRF_TOKEN, URL, S = get_token(True)
+    # Step 4: Post request to upload a file directly
+    PARAMS_4 = {
+        "action": "upload",
+        "filename": f"{upload_name} edit count.png",
+        "format": "json",
+        "token": CSRF_TOKEN,
+        "ignorewarnings": 1  # overwriting is expected
+    }
+
+    FILE = {'file': (upload_name, open(filename, 'rb'), 'multipart/form-data')}
+
+    R = S.post(URL, files=FILE, data=PARAMS_4)
+    DATA = R.json()
+    print(DATA)
+
+
+def push_to_wiki(page_name, string_to_print):
+    CSRF_TOKEN, URL, S = get_token(False)
 
     # Step 4: POST request to edit a page
     PARAMS_3 = {
