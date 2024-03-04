@@ -167,7 +167,7 @@ def graph_data(df, wiki_name):
     plt.savefig("tempgraph.png")
     upload_file('tempgraph.png', f'{wiki_name} edit count')
     push_to_wiki(f'File:{wiki_name} edit count.png',
-                 f'Edit count for {wiki_name} \n \n [[Category: Global statistics]]')
+                 f'Edit count for {wiki_name} \n \n [[Category: Global statistics]]', upload=True)
 
 
 def local_wiki_processing(folderloc):
@@ -251,7 +251,7 @@ def upload_file(filename, upload_name):
     # Step 4: Post request to upload a file directly
     PARAMS_4 = {
         "action": "upload",
-        "filename": f"{upload_name} edit count.png",
+        "filename": f"{upload_name}.png",
         "format": "json",
         "token": CSRF_TOKEN,
         "ignorewarnings": 1  # overwriting is expected
@@ -264,8 +264,11 @@ def upload_file(filename, upload_name):
     print(DATA)
 
 
-def push_to_wiki(page_name, string_to_print):
-    CSRF_TOKEN, URL, S = get_token(False)
+def push_to_wiki(page_name, string_to_print, upload=False):
+    if upload:
+        CSRF_TOKEN, URL, S = get_token(True)
+    else:
+        CSRF_TOKEN, URL, S = get_token(False)
 
     # Step 4: POST request to edit a page
     PARAMS_3 = {
