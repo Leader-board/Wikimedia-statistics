@@ -169,7 +169,7 @@ def graph_data(df, wiki_name):
     plt.savefig("tempgraph.svg")
     upload_file('tempgraph.svg', f'{wiki_name} edit count')
     push_to_wiki(f'File:{wiki_name} edit count.svg',
-                 f'{{{{Information\n|description={{{{en|Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]}}}}\n|date={{date.today()}}\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
+                 f'{{{{Information\n|description={{{{en|Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]}}}}\n|date={date.today()}\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
                  f'{{{{self|cc-by-sa-4.0}}}}\n'
                  f'\n[[Category: Global statistics]]', upload=True)
     plt.clf()
