@@ -273,7 +273,7 @@ def push_to_wiki(page_name, string_to_print, upload=False):
     # Step 4: POST request to edit a page
     PARAMS_3 = {
         "action": "edit",
-        "title": 'Global statistics/' + page_name,
+        "title": 'Global statistics/' + page_name if not upload else page_name,
         "token": CSRF_TOKEN,
         "format": "json",
         "text": string_to_print,
