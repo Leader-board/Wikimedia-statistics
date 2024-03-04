@@ -33,9 +33,8 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
               inplace=True)
     # df on its own is useful when graphing
 
-    full_df = df.copy(deep=True)
-
     df = df[df['Edits'] >= 1]  # weed out users with no edits
+    full_df = df.copy(deep=True)
     df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '0'  # remove nan
     df['Registration_date'] = df['Registration_date'].astype(int)
     df['Registration_date'] = df['Registration_date'].astype(str)
@@ -166,7 +165,7 @@ def get_percentile_data(dframe, wikiname):
 
 def graph_data(df, wiki_name):
     print(f"Graphing {wiki_name}")
-    sns.histplot(data=df, x='Edits', kde=True, log_scale=True).set(title=f'{wiki_name} edit count')
+    sns.histplot(data=df, x='Edits', kde=False, log_scale=True).set(title=f'{wiki_name} edit count')
     plt.savefig("tempgraph.svg")
     upload_file('tempgraph.svg', f'{wiki_name} edit count')
     push_to_wiki(f'File:{wiki_name} edit count.svg',
