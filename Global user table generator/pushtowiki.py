@@ -158,6 +158,7 @@ def get_percentile_data(dframe, wikiname):
 
 
 def graph_data(df, wiki_name):
+    print(f"Graphing {wiki_name}")
     edit_cnts = sns.load_dataset(df['Edits'])
     sns.histplot(data=edit_cnts, x='Number of edits', kde=True, log_scale=True).set(title=f'{wiki_name} edit count')
     plt.savefig("tempgraph.png")
@@ -198,9 +199,9 @@ def get_token(upload):
         print("The botdetails file is not in the expected format")
         return
     if upload:
-        URL = filecont[0]
-    else:
         URL = filecont[4]
+    else:
+        URL = filecont[0]
     # Step 1: GET request to fetch login token
     PARAMS_0 = {
         "action": "query",
