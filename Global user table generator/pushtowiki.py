@@ -6,6 +6,7 @@ import csv
 import mysql.connector
 import seaborn as sns
 import matplotlib.pyplot as plt
+import os
 
 from iso639 import Lang
 
@@ -170,6 +171,7 @@ def graph_data(df, wiki_name):
                  f'{{{{Information\n|description=Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]\n|date=tbd\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
                  f'{{{{self|cc-by-sa-4.0}}}}\n'
                  f'\n[[Category: Global statistics]]', upload=True)
+    os.remove('tempgraph.svg')
     plt.clf()
 
 
