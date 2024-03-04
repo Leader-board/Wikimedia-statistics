@@ -170,6 +170,7 @@ def graph_data(df, wiki_name):
                  f'{{{{Information\n|description=Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]\n|date=tbd\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
                  f'{{{{self|cc-by-sa-4.0}}}}\n'
                  f'\n[[Category: Global statistics]]', upload=True)
+    plt.clf()
 
 
 def local_wiki_processing(folderloc):
@@ -295,6 +296,7 @@ def main():
     string_to_print = header_data('Global') + stp
     push_to_wiki("Rank data/Global", string_to_print)
     graph_data(graph_df, 'Global')
+    plt.clf()
     percentile_toprint = '=={}==\n\n'.format("Global") + get_percentile_data(df, "Global") + local_wiki_processing(
         '/statdata/rawcsv')
     push_to_wiki("Percentiles", percentile_toprint)
