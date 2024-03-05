@@ -163,7 +163,9 @@ def get_percentile_data(dframe, wikiname):
 
 def graph_data(df, wiki_name):
     print(f"Graphing {wiki_name}")
-    sns.histplot(data=df, x='Edits', kde=False, log_scale=True).set(title=f'{wiki_name} edit count')
+    sns.histplot(data=df, x='Edits', kde=False).set(title=f'{wiki_name} edit count')
+    plt.yscale('log', basey=2)
+    plt.xscale('log', basex=2)
     plt.savefig("tempgraph.svg")
     upload_file('tempgraph.svg', f'{wiki_name} edit count')
     push_to_wiki(f'File:{wiki_name} edit count.svg',
