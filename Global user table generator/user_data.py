@@ -111,7 +111,7 @@ def push_to_wiki(username, string_to_print):
     filecont = f.read().splitlines()
     f.close()
     print(filecont)
-    if (len(filecont) != 4):
+    if len(filecont) != 5:
         print("The botdetails file is not in the expected format")
         return
     URL = filecont[0]
