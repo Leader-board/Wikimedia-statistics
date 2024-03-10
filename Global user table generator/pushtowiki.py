@@ -6,7 +6,8 @@ import csv
 import mysql.connector
 import seaborn as sns
 import matplotlib.pyplot as plt
-from datetime import date
+from datetime import date, timezone, datetime
+from filehash import FileHash
 
 import os
 
@@ -167,7 +168,9 @@ def graph_data(df, wiki_name):
     plt.yscale('log', basey=2)
     plt.xscale('log', basex=2)
     plt.savefig("tempgraph.svg")
-    upload_file('tempgraph.svg', f'{wiki_name} edit count')
+    status = upload_file('tempgraph.svg', f'{wiki_name} edit count')
+    if not status:
+        pass # don't push to wiki either
     push_to_wiki(f'File:{wiki_name} edit count.svg',
                  f'{{{{Information\n|description={{{{en|Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]}}}}\n|date={date.today()}\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
                  f'{{{{self|cc-by-sa-4.0}}}}\n'
@@ -248,11 +251,31 @@ def get_token(upload):
 
     CSRF_TOKEN = DATA['query']['tokens']['csrftoken']
 
-    return CSRF_TOKEN, URL, S
+    return CSRF_TOKEN, URL, S, filecont[4]
 
 
 def upload_file(filename, upload_name):
-    CSRF_TOKEN, URL, S = get_token(True)
+    CSRF_TOKEN, URL, S, upload_api = get_token(True)
+
+    # first make sure that the last version is NOT a duplicate
+    # check whether the image even exists
+    img_req_json = S.get(f'{upload_api}?action=query&titles=File:{upload_name}.svg&prop=imageinfo&iiprop=sha1|timestamp&format=json').json()
+    if 'imageinfo' not in img_req_json['query']['pages']['-1']:
+        pass # file doesn't exist, so continue
+    else:
+        img_sha1 = img_req_json['query']['pages']['-1']['imageinfo'][0]['sha1']
+        # find SHA1 of the file to upload
+        sha1hasher = FileHash('sha1')
+        new_sha1 = sha1hasher.hash_file(filename)
+        if img_sha1 == new_sha1:
+            return False # don't upload - images are the same
+        # now check time
+        timestamp = datetime.fromisoformat(img_req_json['query']['pages']['-1']['imageinfo'][0]['timestamp'])
+        current_date = datetime.now(timezone.utc)
+        days_diff = (current_date - timestamp).days
+        if days_diff < 6:
+            return False # too little a gap
+
     # Step 4: Post request to upload a file directly
     PARAMS_4 = {
         "action": "upload",
@@ -267,13 +290,14 @@ def upload_file(filename, upload_name):
     R = S.post(URL, files=FILE, data=PARAMS_4)
     DATA = R.json()
     print(DATA)
+    return True
 
 
 def push_to_wiki(page_name, string_to_print, upload=False):
     if upload:
-        CSRF_TOKEN, URL, S = get_token(True)
+        CSRF_TOKEN, URL, S, upload_api = get_token(True)
     else:
-        CSRF_TOKEN, URL, S = get_token(False)
+        CSRF_TOKEN, URL, S, upload_api = get_token(False)
 
     # Step 4: POST request to edit a page
     PARAMS_3 = {
