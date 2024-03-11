@@ -259,19 +259,20 @@ def upload_file(filename, upload_name):
     # first make sure that the last version is NOT a duplicate
     # check whether the image even exists
     img_req_json = S.get(f'{upload_api}?action=query&titles=File:{upload_name}.svg&prop=imageinfo&iiprop=sha1|timestamp&format=json').json()
-    print(f'{upload_api}?action=query&titles=File:{upload_name}.svg&prop=imageinfo&iiprop=sha1|timestamp&format=json')
+    #print(f'{upload_api}?action=query&titles=File:{upload_name}.svg&prop=imageinfo&iiprop=sha1|timestamp&format=json')
     print(img_req_json)
-    if 'imageinfo' not in img_req_json['query']['pages']['-1']:
+    img_dict = img_req_json.popitem()[0] # https://stackoverflow.com/questions/46042430/best-way-to-get-a-single-key-from-a-dictionary - only one value
+    if 'imageinfo' not in img_dict:
         pass # file doesn't exist, so continue
     else:
-        img_sha1 = img_req_json['query']['pages']['-1']['imageinfo'][0]['sha1']
+        img_sha1 = img_dict['imageinfo'][0]['sha1']
         # find SHA1 of the file to upload
         sha1hasher = FileHash('sha1')
         new_sha1 = sha1hasher.hash_file(filename)
         if img_sha1 == new_sha1:
             return False # don't upload - images are the same
         # now check time
-        timestamp = datetime.fromisoformat(img_req_json['query']['pages']['-1']['imageinfo'][0]['timestamp'])
+        timestamp = datetime.fromisoformat(img_dict['imageinfo'][0]['timestamp'])
         current_date = datetime.now(timezone.utc)
         days_diff = (current_date - timestamp).days
         if days_diff < 6:
