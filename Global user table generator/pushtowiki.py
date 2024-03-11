@@ -6,7 +6,7 @@ import csv
 import mysql.connector
 import seaborn as sns
 import matplotlib.pyplot as plt
-from datetime import date, timezone, datetime
+from datetime import date, timezone, datetime, parser
 from filehash import FileHash
 
 import os
@@ -274,7 +274,7 @@ def upload_file(filename, upload_name):
         if img_sha1 == new_sha1:
             return False  # don't upload - images are the same
         # now check time
-        timestamp = datetime.fromisoformat(img_dict['imageinfo'][0]['timestamp'])
+        timestamp = datetime.fromisoformat(parser.parse(img_dict['imageinfo'][0]['timestamp'])) # required since Python 3.9 does not allow 'Z'-based ISO dates - https://stackoverflow.com/questions/55542280/why-does-python-3-find-this-iso8601-date-2019-04-05t165526z-invalid
         current_date = datetime.now(timezone.utc)
         days_diff = (current_date - timestamp).days
         print(f'{days_diff} {current_date} {timestamp}')
