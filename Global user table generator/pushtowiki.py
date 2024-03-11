@@ -259,11 +259,11 @@ def upload_file(filename, upload_name):
     # first make sure that the last version is NOT a duplicate
     # check whether the image even exists
     img_req_json = S.get(
-        f'{upload_api}?action=query&titles=File:{upload_name}.svg&prop=imageinfo&iiprop=sha1|timestamp&format=json').json()
+        f'{upload_api}?action=query&titles=File:{upload_name}.svg&prop=imageinfo&iiprop=sha1|timestamp&format=json').json()['query']['pages']
     # print(f'{upload_api}?action=query&titles=File:{upload_name}.svg&prop=imageinfo&iiprop=sha1|timestamp&format=json')
-    print(img_req_json)
     img_dict = img_req_json.popitem()[
         0]  # https://stackoverflow.com/questions/46042430/best-way-to-get-a-single-key-from-a-dictionary - only one value
+    print(img_dict)
     if 'imageinfo' not in img_dict:
         pass  # file doesn't exist, so continue
     else:
