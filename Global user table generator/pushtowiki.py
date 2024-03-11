@@ -35,6 +35,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     # df on its own is useful when graphing
 
     df = df[df['Edits'] >= 1]  # weed out users with no edits
+    full_df = df.copy(deep=True)
     df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '0'  # remove nan
     df['Registration_date'] = df['Registration_date'].astype(int)
     df['Registration_date'] = df['Registration_date'].astype(str)
@@ -66,7 +67,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
     # print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
 
-    return toprint, df
+    return toprint, df, full_df
 
 
 def add_categories(wiki_name):
@@ -163,17 +164,16 @@ def get_percentile_data(dframe, wikiname):
 
 def graph_data(df, wiki_name):
     print(f"Graphing {wiki_name}")
-    sns.histplot(data=df, x='Edits', kde=False).set(title=f'{wiki_name} edit count')
-    plt.yscale('log', basey=2)
-    plt.xscale('log', basex=2)
+    sns.histplot(data=df, x='Edits', kde=False, log_scale=(2,2)).set(title=f'{wiki_name} edit count')
+    # plt.yscale('log', base=2)
+    # plt.xscale('log', base=2)
     plt.savefig("tempgraph.svg")
     status = upload_file('tempgraph.svg', f'{wiki_name} edit count')
-    if not status:
-        pass # don't push to wiki either
-    push_to_wiki(f'File:{wiki_name} edit count.svg',
-                 f'{{{{Information\n|description={{{{en|Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]}}}}\n|date={date.today()}\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
-                 f'{{{{self|cc-by-sa-4.0}}}}\n'
-                 f'\n[[Category: Global statistics]]', upload=True)
+    if status:
+        push_to_wiki(f'File:{wiki_name} edit count.svg',
+                     f'{{{{Information\n|description={{{{en|Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]}}}}\n|date={date.today()}\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
+                     f'{{{{self|cc-by-sa-4.0}}}}\n'
+                     f'\n[[Category: Global statistics]]', upload=True)
     plt.clf()
 
 
@@ -186,11 +186,11 @@ def local_wiki_processing(folderloc):
         # print it the same way
         page_name = str(f)[:-4]
         print("Currently processing: {}".format(page_name))
-        tp, dframe = convert_to_string(filename, False, page_name)
+        tp, dframe, graph_df = convert_to_string(filename, False, page_name)
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
-        graph_data(dframe, page_name)
+        graph_data(graph_df, page_name)
         # print(toprint)
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
@@ -317,10 +317,10 @@ def push_to_wiki(page_name, string_to_print, upload=False):
 def main():
     fileloc = '/statdata/processed_csv/globalcontribs.csv'
     # H://testdata.txt
-    stp, df = convert_to_string(fileloc, True)
+    stp, df, graph_df = convert_to_string(fileloc, True)
     string_to_print = header_data('Global') + stp
     push_to_wiki("Rank data/Global", string_to_print)
-    graph_data(df, 'Global')
+    graph_data(graph_df, 'Global')
     plt.clf()
     percentile_toprint = '=={}==\n\n'.format("Global") + get_percentile_data(df, "Global") + local_wiki_processing(
         '/statdata/rawcsv')
