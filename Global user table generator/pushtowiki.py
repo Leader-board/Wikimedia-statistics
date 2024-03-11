@@ -6,7 +6,8 @@ import csv
 import mysql.connector
 import seaborn as sns
 import matplotlib.pyplot as plt
-from datetime import date, timezone, datetime, parser
+from datetime import date, timezone, datetime
+from dateutil import parser
 from filehash import FileHash
 
 import os
