@@ -35,7 +35,6 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     # df on its own is useful when graphing
 
     df = df[df['Edits'] >= 1]  # weed out users with no edits
-    full_df = df.copy(deep=True)
     df.loc[df['Registration_date'].astype(str) == 'nan', 'Registration_date'] = '0'  # remove nan
     df['Registration_date'] = df['Registration_date'].astype(int)
     df['Registration_date'] = df['Registration_date'].astype(str)
@@ -67,7 +66,7 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
     # print(f"first 1000 chars of global: {toprint[:1000].encode('unicode_escape')}")
     # print(f"last 1000 chars of global: {toprint[:-1000].encode('unicode_escape')}")
 
-    return toprint, df, full_df
+    return toprint, df
 
 
 def add_categories(wiki_name):
@@ -187,11 +186,11 @@ def local_wiki_processing(folderloc):
         # print it the same way
         page_name = str(f)[:-4]
         print("Currently processing: {}".format(page_name))
-        tp, dframe, graph_df = convert_to_string(filename, False, page_name)
+        tp, dframe = convert_to_string(filename, False, page_name)
         toprint = header_data(page_name) + tp
         # and push it to an appropriate place on the wiki
         push_to_wiki('Rank data/' + page_name, toprint)
-        graph_data(graph_df, page_name)
+        graph_data(dframe, page_name)
         # print(toprint)
         percentile_toprint = percentile_toprint + '=={}==\n\n'.format(page_name)
         percentile_toprint = percentile_toprint + get_percentile_data(dframe, page_name)
@@ -318,10 +317,10 @@ def push_to_wiki(page_name, string_to_print, upload=False):
 def main():
     fileloc = '/statdata/processed_csv/globalcontribs.csv'
     # H://testdata.txt
-    stp, df, graph_df = convert_to_string(fileloc, True)
+    stp, df = convert_to_string(fileloc, True)
     string_to_print = header_data('Global') + stp
     push_to_wiki("Rank data/Global", string_to_print)
-    graph_data(graph_df, 'Global')
+    graph_data(df, 'Global')
     plt.clf()
     percentile_toprint = '=={}==\n\n'.format("Global") + get_percentile_data(df, "Global") + local_wiki_processing(
         '/statdata/rawcsv')
