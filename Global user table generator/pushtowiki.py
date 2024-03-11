@@ -259,6 +259,7 @@ def upload_file(filename, upload_name):
     # first make sure that the last version is NOT a duplicate
     # check whether the image even exists
     img_req_json = S.get(f'{upload_api}?action=query&titles=File:{upload_name}.svg&prop=imageinfo&iiprop=sha1|timestamp&format=json').json()
+    print(img_req_json)
     if 'imageinfo' not in img_req_json['query']['pages']['-1']:
         pass # file doesn't exist, so continue
     else:
