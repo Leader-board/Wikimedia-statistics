@@ -87,7 +87,7 @@ def add_categories(wiki_name):
                               wikimania2011wiki='Wikimania 2011', wikimania2010wiki='Wikimania 2010',
                               wikimania2009wiki='Wikimania 2009', wikimania2008wiki='Wikimania 2018',
                               wikimania2007wiki='Wikimania 2007', wikimania2006wiki='Wikimania 2006',
-                              wikimania2005wiki='Wikimania 2005')
+                              wikimania2005wiki='Wikimania 2005', labswiki='Wikitech')
 
     # get the global table
     cursor = cnx.cursor()
@@ -175,7 +175,7 @@ def graph_data(df, wiki_name):
         push_to_wiki(f'File:{wiki_name} edit count.svg',
                      f'{{{{Information\n|description={{{{en|Edit count for {wiki_name} as part of [[meta:Global statistics|Global statistics]]}}}}\n|date={date.today()}\n|source={{{{own}}}}\n|author=[[User:Leaderbot|Leaderbot]]}}}}\n'
                      f'{{{{self|cc-by-sa-4.0}}}}\n'
-                     f'\n[[Category: Global statistics]]', upload=True)
+                     f'\n[[Category: Global statistics]]\n{add_categories(wiki_name)}', upload=True)
     plt.clf()
 
 
