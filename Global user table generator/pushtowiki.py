@@ -74,6 +74,8 @@ def convert_to_string(fileloc, rankinc, wiki_name=None):
 def add_categories(wiki_name):
     # input is something like 'enwiki', 'mlwikisource'
     # find the language
+    if wiki_name == 'global':
+        return '' # no categories
     cnx = mysql.connector.connect(option_files='/root/replica.my.cnf', host='meta.analytics.db.svc.wikimedia.cloud',
                                   database='meta_p')
 
